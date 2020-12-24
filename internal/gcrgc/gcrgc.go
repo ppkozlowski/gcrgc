@@ -18,6 +18,7 @@ type Settings struct {
 	Registry             string
 	Repositories         []string
 	Date                 time.Time
+	KeepLimit            int
 	UntaggedOnly         bool
 	DryRun               bool
 	AllRepositories      bool
@@ -110,9 +111,14 @@ func getTaskList(gcr docker.Provider, repository []docker.Repository, s *Setting
 	tasks := []task{}
 
 	for _, repo := range repository {
+		allImgs := gcr.ListImages(repo.Name, time.Now())
 		imgs := gcr.ListImages(repo.Name, date)
 
 		filteredImgs := filterImages(imgs, filters)
+
+		if (len(allImgs) - len(filteredImgs)) < s.KeepLimit {
+			continue
+		}
 
 		fmt.Printf("%d matches for repository [%s]\n", len(filteredImgs), repo.Name)
 

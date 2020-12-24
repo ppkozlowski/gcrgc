@@ -34,6 +34,7 @@ func TestGetsTaskList(t *testing.T) {
 		ExcludeSemVerTags:   true,
 		ExcludedTagPatterns: []string{"^excluded-pattern-[0-9]*$"},
 		ExcludedTags:        []string{"excluded"},
+		KeepLimit:           0,
 	}
 	var (
 		provider     = &fakeProvider{}
@@ -48,6 +49,27 @@ func TestGetsTaskList(t *testing.T) {
 	task := tasks[0]
 	if task.repository != "image" {
 		t.Errorf("Expected task key to be the name of the repository")
+	}
+}
+
+func TestGetsTaskListWithKeepLimit(t *testing.T) {
+	var settings = Settings{
+		Registry:            "gcr.io/foo",
+		AllRepositories:     true,
+		Date:                time.Time{},
+		ExcludeSemVerTags:   true,
+		ExcludedTagPatterns: []string{"^excluded-pattern-[0-9]*$"},
+		KeepLimit:           2,
+	}
+	var (
+		provider     = &fakeProvider{}
+		repositories = []docker.Repository{*docker.NewRepository("image")}
+	)
+
+	tasks := getTaskList(provider, repositories, &settings)
+
+	if len(tasks) != 2 {
+		t.Errorf("Expected tasks number to be %d, got %d instead", 2, len(tasks))
 	}
 }
 

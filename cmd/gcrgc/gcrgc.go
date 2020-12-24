@@ -48,6 +48,7 @@ func ParseArgs() *gcrgc.Settings {
 	flag.StringSlice("repositories", []string{}, "A comma-separated list of repositories to include in the cleanup process.")
 	flag.String("date", "", "Only delete images older than YYYY-MM-DD")
 	flag.String("retention-period", "", "The retention period: only older items will be deleted. Must have the form: `30 days`, `1w`, `24h`")
+	flag.Int("keep-limit", 0, "The keep limit: do not delete if number of images in repository is under keep-limit")
 	flag.Bool("untagged-only", false, "Only remove untagged images. Defaults to false.")
 	flag.Bool("dry-run", false, "Only see the output of what would be deleted but don't actually delete anything. Defaults to false.")
 	flag.StringSlice("exclude-repositories", []string{}, "A comma-separated list of repositories to be excluded. Not compatible with the --repositories option.")
@@ -102,6 +103,7 @@ func ParseArgs() *gcrgc.Settings {
 		ExcludedTags:         viper.GetStringSlice("exclude-tags"),
 		ExcludedTagPatterns:  viper.GetStringSlice("exclude-tag-pattern"),
 		Date:                 viper.GetTime("date"),
+		KeepLimit:            viper.GetInt("keep-limit"),
 		DryRun:               viper.GetBool("dry-run"),
 	}
 
